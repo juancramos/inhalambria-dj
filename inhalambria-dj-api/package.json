@@ -1,0 +1,51 @@
+{
+  "name": "inhalambria-api",
+  "description": "",
+  "version": "0.0.0",
+  "homepage": "",
+  "main": "./",
+  "keywords": [
+    "feathers"
+  ],
+  "author": {
+    "name": "Juan Carlos Hernandez Ramos",
+    "email": "contacto@juancramos.com"
+  },
+  "contributors": [],
+  "bugs": {},
+  "directories": {
+    "lib": "./",
+    "test": "test/",
+    "config": "config/"
+  },
+  "engines": {
+    "node": "^12.0.0",
+    "npm": ">= 3.0.0"
+  },
+  "scripts": {
+    "test": "npm run eslint && npm run mocha",
+    "eslint": "eslint .//. test/. --config .eslintrc.json",
+    "dev": "nodemon .//",
+    "start": "node .//",
+    "mocha": "mocha test/ --recursive --exit"
+  },
+  "dependencies": {
+    "@feathersjs/authentication": "^4.4.1",
+    "@feathersjs/authentication-local": "^4.4.1",
+    "@feathersjs/authentication-oauth": "^4.4.1",
+    "@feathersjs/configuration": "^4.4.1",
+    "@feathersjs/errors": "^4.4.1",
+    "@feathersjs/express": "^4.4.1",
+    "@feathersjs/feathers": "^4.4.1",
+    "@feathersjs/socketio": "^4.4.1",
+    "@feathersjs/transport-commons": "^4.4.1",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "feathers-sequelize": "^6.1.0",
+    "helmet": "^3.21.2",
+    "mysql2": "^2.0.1",
+    "sequelize": "^5.21.2",
+    "serve-favicon": "^2.5.0",
+    "winston": "^3.2.1"
+  }
+}
