@@ -19,6 +19,8 @@
               type="text"
               placeholder="example@example.com"
               value=""
+              password-reveal
+              v-model="email"
             />
             <span class="icon is-small is-left">
               <i class="fas fa-user"></i>
@@ -39,6 +41,8 @@
               type="password"
               placeholder="Super strong password"
               value=""
+              password-reveal
+              v-model="password"
             />
             <span class="icon is-small is-left">
               <i class="fas fa-key"></i>
@@ -68,10 +72,9 @@
         </div>
 
         <p></p>
-        
       </div>
       <footer class="card-footer">
-        <a href="#" class="card-footer-item">Submit</a>
+        <a href="#" class="card-footer-item" v-on:click="register">Submit</a>
         <a href="#" class="card-footer-item">Cancel</a>
       </footer>
     </div>
@@ -79,14 +82,56 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
+
 export default {
   name: "LoginUser",
   components: {},
   data() {
     return {
+      email: undefined,
+      password: undefined,
       error: false,
-      errorText: ''
+      errorText: ""
     };
+  },
+  methods: {
+    register: function() {
+      this.isLoading = true;
+      // Automatically log the user in after successful signup.
+      this.createUser({
+        email: this.email,
+        password: this.password
+      })
+        .then(data => {
+          this.authenticate({
+            strategy: "local",
+            email: data.email,
+            password: this.password
+          })
+            .then(data => {
+              console.log(data);
+              this.$router.push("/");
+            })
+            .catch(() => {
+              this.isLoading = false;
+              this.$router.push("/");
+            });
+        })
+        .catch(error => {
+          this.isLoading = false;
+          // Convert the error to a plain object and add a message.
+          let type = error.errorType;
+          error = Object.assign({}, error);
+          error.message =
+            type === "uniqueViolated"
+              ? "That email address is unavailable."
+              : "An error prevented signup.";
+          this.error = error;
+        });
+    },
+    ...mapActions("users", { createUser: "create" }),
+    ...mapActions("auth", ["authenticate"])
   }
 };
 </script>

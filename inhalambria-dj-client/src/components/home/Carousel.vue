@@ -12,16 +12,17 @@
           <div
             class="columns container"
             v-bind:style="{
-              backgroundImage: `url(${getImgUrl(item.images[1].url)})`
+              backgroundImage: `url(${getImgUrl(item.album.images[1].url)})`
             }"
           >
             <img
               class="column is-2 is-offset-2"
-              :src="getImgUrl(item.images[1].url)"
+              :src="getImgUrl(item.album.images[1].url)"
             />
             <div class="shadow column is-5 is-offset-1">
               <h1 class="title">{{ item.name }}</h1>
               <h2>{{ item.artists[0].name }}</h2>
+              <h2>{{ millisToMinutesAndSeconds(item.duration_ms) }}</h2>
             </div>
           </div>
         </b-carousel-item>
@@ -50,12 +51,20 @@ export default {
       this.data = [];
       for (let i = 0; i < 5; i++) {
         if (!items[i]) break;
-        items[i].release_date = items[i].release_date.replace(/-/g, "/");
+        items[i].album.release_date = items[i].album.release_date.replace(
+          /-/g,
+          "/"
+        );
         this.data.push(items[i]);
       }
     },
     getImgUrl(value) {
       return `${value}`;
+    },
+    millisToMinutesAndSeconds(millis) {
+      var minutes = Math.floor(millis / 60000);
+      var seconds = ((millis % 60000) / 1000).toFixed(0);
+      return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
     }
   },
   data() {

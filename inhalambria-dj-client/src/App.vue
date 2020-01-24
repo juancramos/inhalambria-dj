@@ -23,7 +23,7 @@
           </template>
 
           <template slot="end">
-            <b-navbar-item tag="div">
+            <b-navbar-item v-if="!authUser" tag="div">
               <div class="buttons">
                 <router-link
                   tag="a"
@@ -38,6 +38,17 @@
                   :to="{ path: '/login' }"
                 >
                   Log in
+                </router-link>
+              </div>
+            </b-navbar-item>
+            <b-navbar-item v-else tag="div">
+              <div class="buttons" v-on:click="logoutApp">
+                <router-link
+                  tag="a"
+                  class="button is-light"
+                  :to="{ path: '/' }"
+                >
+                  Log out
                 </router-link>
               </div>
             </b-navbar-item>
@@ -64,6 +75,49 @@
     </footer>
   </div>
 </template>
+
+<script>
+import { mapGetters, mapActions } from "vuex";
+
+export default {
+  name: "App",
+  data() {
+    return {
+      authUser: undefined
+    };
+  },
+  computed: {},
+  methods: {
+    ...mapGetters("auth", ["isAuthenticated", "user"]),
+    ...mapActions("auth", ["logout", "authenticate"]),
+    logoutApp: function() {
+      this.logout()
+        .then(() => (this.authUser = undefined))
+        .catch(e => console.log(e));
+    }
+  },
+  watch: {
+    user(user) {
+      console.log(user);
+    },
+    isAuthenticated(n) {
+      console.log(n);
+    }
+  },
+  updated() {},
+  created() {},
+  mounted() {
+    console.log("mounted");
+    this.authenticate()
+      .then(user => {
+        this.authUser = user;
+      })
+      .catch(() => {
+        this.$router.push("/login");
+      });
+  }
+};
+</script>
 
 <style>
 #app {

@@ -19,6 +19,7 @@
               type="text"
               placeholder="example@example.com"
               value=""
+              v-model="email"
             />
             <span class="icon is-small is-left">
               <i class="fas fa-user"></i>
@@ -39,6 +40,8 @@
               type="password"
               placeholder="Super strong password"
               value=""
+              password-reveal
+              v-model="password"
             />
             <span class="icon is-small is-left">
               <i class="fas fa-key"></i>
@@ -57,10 +60,9 @@
             Wrong user information, please try again.
           </p>
         </div>
-        
       </div>
       <footer class="card-footer">
-        <a href="#" class="card-footer-item">Submit</a>
+        <a href="#" class="card-footer-item" v-on:click="login">Submit</a>
         <a href="#" class="card-footer-item">Cancel</a>
       </footer>
     </div>
@@ -68,13 +70,52 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
+
 export default {
   name: "LoginUser",
   components: {},
   data() {
     return {
+      email: undefined,
+      password: undefined,
+      rememberMe: false,
+      isLoading: false,
       error: false
     };
+  },
+  methods: {
+    ...mapGetters("auth", ["isAuthenticated", "user"]),
+    validateBeforeSubmit() {
+      this.$validator.validateAll().then(result => {
+        if (result) {
+          this.login(this.email, this.password);
+        }
+      });
+    },
+    login: function() {
+      this.isLoading = true;
+      this.authenticate({
+        strategy: "local",
+        email: this.email,
+        password: this.password
+      })
+        .then(() => {
+          this.$router.push("/");
+        })
+        // Just use the returned error instead of mapping it from the store.
+        .catch(error => {
+          this.isLoading = false;
+          // Convert the error to a plain object and add a message.
+          let type = error.className;
+          if (type === "not-authenticated") {
+            error = Object.assign({}, error);
+            error.message = "Incorrect email or password.";
+            this.error = error;
+          }
+        });
+    },
+    ...mapActions("auth", ["authenticate"])
   }
 };
 </script>

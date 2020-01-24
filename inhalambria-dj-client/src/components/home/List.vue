@@ -20,18 +20,22 @@
         icon-pack="fas"
       >
         <template slot-scope="props">
-          <b-table-column field="album_title" label="Album title" sortable>
+          <b-table-column field="track_title" label="Track title" sortable>
             {{ props.row.name }}
           </b-table-column>
 
+          <b-table-column field="album_name" label="Album name">
+            {{ props.row.album.name }}
+          </b-table-column>
+
           <b-table-column
-            field="tracks count"
+            field="tracks_count"
             label="Tracks count"
             numeric
             sortable
           >
-            <span class="tag" :class="type(props.row.vote_average)">
-              {{ props.row.total_tracks }}
+            <span class="tag" :class="type(props.row.album.total_tracks)">
+              {{ props.row.album.total_tracks }}
             </span>
           </b-table-column>
 
@@ -42,13 +46,13 @@
             centered
           >
             {{
-              props.row.release_date
-                ? new Date(props.row.release_date).toLocaleDateString()
+              props.row.album.release_date
+                ? new Date(props.row.album.release_date).toLocaleDateString()
                 : ""
             }}
           </b-table-column>
 
-          <b-table-column label="Artist" width="500">
+          <b-table-column field="artist" label="Artist">
             {{ props.row.artists[0].name | truncate(80) }}
           </b-table-column>
         </template>
@@ -67,11 +71,11 @@ export default {
       data: [],
       total: 0,
       loading: false,
-      sortField: "vote_count",
+      sortField: "tracks_count",
       sortOrder: "desc",
       defaultSortOrder: "desc",
       page: 0,
-      perPage: 20
+      perPage: 50
     };
   },
   methods: {
@@ -93,7 +97,7 @@ export default {
       this.total = currentTotal;
       items.forEach(item => {
         if (!item) return;
-        item.release_date = item.release_date.replace(/-/g, "/");
+        item.album.release_date = item.album.release_date.replace(/-/g, "/");
         this.data.push(item);
       });
       this.loading = false;

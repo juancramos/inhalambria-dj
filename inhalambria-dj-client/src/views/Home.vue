@@ -14,6 +14,9 @@ import List from "@/components/home/List.vue";
 
 import axios from "axios";
 
+const CLIENT_ID = "";
+const CLIENT_SECRET = "";
+
 export default {
   name: "home",
   components: {
@@ -22,35 +25,72 @@ export default {
   },
   data() {
     return {
+      token: undefined,
+      expires_in: undefined,
       data: [],
       page: 0
     };
   },
+  created() {
+    this.getAuthToken();
+  },
   methods: {
+    tokenHasExpired() {
+      const dt = new Date();
+      return this.expires_in && dt >= this.expires_in;
+    },
+    async getAuthToken() {
+      if (this.token && this.expires_in && !this.tokenHasExpired()) return;
+      try {
+        const { data } = await axios.post(
+          "https://accounts.spotify.com/api/token",
+          "grant_type=client_credentials",
+          {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              Authorization: "Basic " + btoa(`${CLIENT_ID}:${CLIENT_SECRET}`)
+            }
+          }
+        );
+        this.token = data.access_token;
+        let dt = new Date();
+        dt.setSeconds(dt.getSeconds() + data.expires_in);
+        this.expires_in = dt;
+        return true;
+      } catch {
+        return false;
+      }
+    },
     /*
      * Load async data
      */
     async loadAsyncData(params) {
       if (this.page === params.page && this.data.length) return this.data;
 
+      if (!this.token || this.tokenHasExpired()) {
+        const gotToken = this.getAuthToken();
+        const res = await gotToken;
+        if (!res) return;
+      }
+
       const query = [
-        "country=CO",
+        "q=year:2020",
+        "type=track",
         "limit=50",
         `offset=${50 * params.page}`
       ].join("&");
 
       try {
-        const fetchedData = await axios.get(
-          `https://api.spotify.com/v1/browse/new-releases?${query}`,
+        const { data } = await axios.get(
+          `https://api.spotify.com/v1/search?${query}`,
           {
             headers: {
-              Authorization:
-                "Bearer BQC0af9QfNqCStE7T6HQ47Ft7HNifynNNO7IUFIytpaq6geQ_cMhWkQPTGeXhu2Mr_9vPbM4gOCGIBi1dYWpi2Q-TmyyWrgB86ABo4rpPQjPpSJHHNpzM8Y2ivXcIsfNYTvDsZwRaQ"
+              Authorization: `Bearer ${this.token}`
             }
           }
         );
 
-        this.data = fetchedData.data.albums;
+        this.data = data.tracks;
         this.page = params.page;
 
         return this.data;
