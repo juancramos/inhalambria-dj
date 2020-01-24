@@ -110,7 +110,6 @@ export default {
             password: this.password
           })
             .then(data => {
-              console.log(data);
               this.$router.push("/");
             })
             .catch(() => {
