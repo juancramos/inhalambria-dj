@@ -14,8 +14,8 @@ import List from "@/components/home/List.vue";
 
 import axios from "axios";
 
-const CLIENT_ID = "";
-const CLIENT_SECRET = "";
+const CLIENT_ID = process.env.VUE_APP_CLIENT_ID;
+const CLIENT_SECRET = process.env.VUE_APP_CLIENT_SECRET;
 
 export default {
   name: "home",
