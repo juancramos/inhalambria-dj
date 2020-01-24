@@ -1,4 +1,4 @@
-# inhalambria-api
+# inhalambria-dj-server
 
 > 
 
@@ -14,7 +14,7 @@ Getting up and running is as easy as 1, 2, 3.
 2. Install your dependencies
 
     ```
-    cd path/to/inhalambria-api
+    cd path/to/inhalambria-dj-server
     npm install
     ```
 

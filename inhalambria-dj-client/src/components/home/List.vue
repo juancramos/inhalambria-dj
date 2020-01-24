@@ -55,6 +55,25 @@
           <b-table-column field="artist" label="Artist">
             {{ props.row.artists[0].name | truncate(80) }}
           </b-table-column>
+
+          <b-table-column v-if="user()" field="" label="">
+            <button
+              class="button is-primary is-small"
+              :disabled="props.row.enabled"
+              v-on:click="
+                favTrack({
+                  trackId: props.row.id,
+                  artist: props.row.artists[0].name,
+                  release_date: props.row.album.release_date,
+                  tracks_count: props.row.album.total_tracks,
+                  album_name: props.row.album.name,
+                  track_title: props.row.name
+                })
+              "
+            >
+              <span>fav </span>
+            </button>
+          </b-table-column>
         </template>
       </b-table>
     </div>
@@ -62,6 +81,8 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
+
 export default {
   props: {
     mainLoadAsyncData: Function
@@ -79,6 +100,40 @@ export default {
     };
   },
   methods: {
+    ...mapGetters("auth", ["user"]),
+    ...mapActions("favorites", {
+      createFavorite: "create",
+      getFavorites: "find"
+    }),
+    async checkTack(id) {
+      try {
+        const { data } = await this.getFavorites({
+          query: {
+            trackId: id,
+            $sort: { createdAt: -1 },
+            $limit: 1
+          }
+        });
+        const res = data.length > 0;
+        return res;
+      } catch {
+        return false;
+      }
+    },
+    favTrack(track) {
+      this.createFavorite({ ...track, userId: this.user().id })
+        .then(res => {
+          let selected = this.data.find(x => x.id === track.trackId);
+          selected.enabled = true;
+          this.$buefy.snackbar.open(`${res.track_title} added to your library`);
+        })
+        .catch(err => {
+          if (err.message.includes("Validation error"))
+            this.$buefy.snackbar.open(`You have already added it.`);
+          else
+            this.$buefy.snackbar.open(`there was an error, try again later!`);
+        });
+    },
     async loadAsyncData() {
       const params = {
         sortField: this.sortField,
@@ -95,9 +150,10 @@ export default {
         currentTotal = this.perPage * 1000;
       }
       this.total = currentTotal;
-      items.forEach(item => {
+      items.forEach(async item => {
         if (!item) return;
         item.album.release_date = item.album.release_date.replace(/-/g, "/");
+        item.enabled = await this.checkTack(item.id);
         this.data.push(item);
       });
       this.loading = false;

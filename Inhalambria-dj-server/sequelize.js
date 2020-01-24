@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 
 module.exports = function (app) {
   const connectionString = app.get('mysql');
-  
+
   let sequelize = null;
   let sequelizeParams = {
     dialect: 'mysql',

@@ -5,19 +5,32 @@ const DataTypes = Sequelize.DataTypes;
 
 module.exports = function (app) {
   const sequelizeClient = app.get('sequelizeClient');
-  const users = sequelizeClient.define('users', {
-  
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true
-    },
-    password: {
+  const favorites = sequelizeClient.define('favorites', {
+    track_title: {
       type: DataTypes.STRING,
       allowNull: false
     },
-  
-  
+    album_name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    tracks_count: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    release_date: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    artist: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    trackId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+    }
   }, {
     hooks: {
       beforeCount(options) {
@@ -27,10 +40,10 @@ module.exports = function (app) {
   });
 
   // eslint-disable-next-line no-unused-vars
-  users.associate = function (models) {
+  favorites.associate = function (models) {
     // Define associations here
     // See http://docs.sequelizejs.com/en/latest/docs/associations/
   };
 
-  return users;
+  return favorites;
 };
