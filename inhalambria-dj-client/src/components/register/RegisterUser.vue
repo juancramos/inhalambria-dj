@@ -109,7 +109,7 @@ export default {
             email: data.email,
             password: this.password
           })
-            .then(data => {
+            .then(() => {
               this.$router.push("/");
             })
             .catch(() => {
